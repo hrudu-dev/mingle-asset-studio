@@ -1,7 +1,7 @@
 {
     "name": "mingle-asset-studio",
     "version": "1.0.0",
-    "description": "Adobe Creative Cloud Web Add-on.",
+    "description": "Adobe Express add-on that helps creators generate, manage, and organize creative assets using smart AI-powered workflows.",
     "scripts": {
         "clean": "ccweb-add-on-scripts clean",
         "build": "ccweb-add-on-scripts build",
@@ -10,10 +10,16 @@
     },
     "keywords": [
         "Adobe",
-        "Creative Cloud Web",
+        "Express",
         "Add-on",
-        "panel"
+        "AI",
+        "Asset Management",
+        "Creative Workflow",
+        "Design Automation"
     ],
+    "dependencies": {
+        "uuid": "^9.0.0"
+    },
     "devDependencies": {
         "@adobe/ccweb-add-on-scripts": "^3.0.0",
         "@types/adobe__ccweb-add-on-sdk": "^1.3.0"

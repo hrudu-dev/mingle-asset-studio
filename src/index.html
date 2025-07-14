@@ -4,48 +4,146 @@
         <meta charset="UTF-8" />
         <meta
             name="description"
-            content="Get started with Add-on development using JavaScript with Document Sandbox Runtime"
+            content="Mingle Asset Studio - AI-powered creative asset generation and management for Adobe Express"
         />
-        <meta name="keywords" content="Adobe, Express, Add-On, JavaScript, Document Sandbox Runtime" />
+        <meta name="keywords" content="Adobe, Express, Add-On, AI, Asset Management, Creative Workflow" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Get Started</title>
-        <style>
-            .container {
-                margin: 24px;
-                display: flex;
-                flex-direction: column;
-            }
-
-            button {
-                background-color: rgb(82, 88, 228);
-                border-color: rgb(82, 88, 228);
-                border-radius: 16px;
-                border-style: solid;
-                color: rgb(255, 255, 255);
-                font-family: sans-serif;
-                height: 32px;
-            }
-
-            button:disabled {
-                background-color: rgb(177, 177, 177);
-                border-color: rgb(177, 177, 177);
-            }
-
-            button:not([disabled]):hover {
-                background-color: rgb(64, 70, 202);
-                cursor: pointer;
-            }
-        </style>
+        <title>Mingle Asset Studio</title>
+        <link rel="stylesheet" href="ui/styles.css" />
     </head>
     <body>
-        <!-- 
-            Please note that this document does not use the spectrum web components theme for Express.
-            You may use "addOnUISdk.app.ui.theme" to get the current theme and style accordingly.
-        -->
-        <div class="container">
-            <button id="createRectangle" disabled>Create Rectangle</button>
-        </div>
+        <div id="mingle-sidebar" class="mingle-sidebar">
+            <!-- Header Bar -->
+            <header class="mingle-header">
+                <div class="mingle-header-left">
+                    <span class="mingle-logo">🖼️</span>
+                    <span class="mingle-title">Mingle Asset Studio</span>
+                </div>
+                <div class="mingle-header-center">
+                    <input id="mainSearch" class="mingle-search" type="text" placeholder="Search or prompt an asset…" />
+                </div>
+                <div class="mingle-header-right">
+                    <button id="settingsBtn" class="icon-btn" title="Settings"><svg class="icon"><use href="#icon-settings"></use></svg></button>
+                </div>
+            </header>
 
+            <!-- Tab Bar -->
+            <nav class="mingle-tabs">
+                <button class="tab-btn active" data-tab="generate">⚡ Generate</button>
+                <button class="tab-btn" data-tab="library">📁 Library</button>
+                <button class="tab-btn" data-tab="brandkit">🎨 Brand Kit</button>
+                <button class="tab-btn" data-tab="insights">📊 Insights</button>
+            </nav>
+
+            <!-- Main Panel Content -->
+            <main class="mingle-main">
+                <!-- Generate Tab -->
+                <section id="tab-generate" class="mingle-tab active">
+                    <div class="generate-form">
+                        <textarea id="promptInput" class="mingle-textarea" rows="3" placeholder="e.g., Modern tech logo with gradient background"></textarea>
+                        <div class="generate-row">
+                            <select id="assetType" class="mingle-select">
+                                <option value="image">Image</option>
+                                <option value="icon">Icon</option>
+                                <option value="template">Template</option>
+                                <option value="layout">Layout</option>
+                                <option value="background">Background</option>
+                            </select>
+                            <select id="styleSelect" class="mingle-select">
+                                <option value="minimal">Minimal</option>
+                                <option value="3d">3D</option>
+                                <option value="abstract">Abstract</option>
+                                <option value="vector">Vector</option>
+                                <option value="photo">Photo-real</option>
+                            </select>
+                            <button id="generateBtn" class="mingle-btn primary"><span class="icon">⚡</span> Generate</button>
+                        </div>
+                    </div>
+                    <div id="generateSpinner" class="mingle-spinner hidden"></div>
+                    <div id="generateResults" class="mingle-results-grid">
+                        <!-- Generated asset cards will be injected here -->
+                    </div>
+                </section>
+
+                <!-- Library Tab -->
+                <section id="tab-library" class="mingle-tab">
+                    <div class="library-bar">
+                        <div class="library-filters">
+                            <button class="filter-btn active" data-filter="all">All</button>
+                            <button class="filter-btn" data-filter="used">Used</button>
+                            <button class="filter-btn" data-filter="unused">Unused</button>
+                            <button class="filter-btn" data-filter="favorites">Favorites</button>
+                        </div>
+                        <select id="librarySort" class="mingle-select">
+                            <option value="date">By Date</option>
+                            <option value="type">By Type</option>
+                            <option value="name">By Name</option>
+                        </select>
+                        <button id="gridToggle" class="icon-btn" title="Grid/List view"><svg class="icon"><use href="#icon-grid"></use></svg></button>
+                    </div>
+                    <div id="libraryAssets" class="library-assets-grid">
+                        <!-- Asset cards will be injected here -->
+                    </div>
+                </section>
+
+                <!-- Brand Kit Tab -->
+                <section id="tab-brandkit" class="mingle-tab">
+                    <div class="brandkit-section">
+                        <div class="brandkit-row">
+                            <label>Logo:</label>
+                            <input type="file" id="brandLogoUpload" accept="image/*" />
+                        </div>
+                        <div class="brandkit-row">
+                            <label>Brand Colors:</label>
+                            <input type="color" id="brandColor1" value="#6366f1" />
+                            <input type="color" id="brandColor2" value="#8b5cf6" />
+                            <input type="color" id="brandColor3" value="#10b981" />
+                        </div>
+                        <div class="brandkit-row">
+                            <label>Typography:</label>
+                            <select id="brandFont" class="mingle-select">
+                                <option value="Inter">Inter</option>
+                                <option value="Roboto">Roboto</option>
+                                <option value="Montserrat">Montserrat</option>
+                                <option value="Lato">Lato</option>
+                                <option value="Poppins">Poppins</option>
+                            </select>
+                            <input type="number" id="brandFontSize" min="8" max="72" value="16" class="mingle-input" style="width:60px;" />
+                            <select id="brandFontWeight" class="mingle-select">
+                                <option value="400">Regular</option>
+                                <option value="500">Medium</option>
+                                <option value="700">Bold</option>
+                            </select>
+                        </div>
+                        <div class="brandkit-row">
+                            <label><input type="checkbox" id="applyBrandKit" /> Apply to Generator</label>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Insights Tab -->
+                <section id="tab-insights" class="mingle-tab">
+                    <div class="insights-section">
+                        <div class="insights-charts">
+                            <div id="chartTopAssets" class="insight-chart"></div>
+                            <div id="chartFormatPopularity" class="insight-chart"></div>
+                            <div id="chartEngagement" class="insight-chart"></div>
+                        </div>
+                        <button id="exportCSV" class="mingle-btn secondary"><span class="icon">⬇️</span> Export as CSV</button>
+                    </div>
+                </section>
+            </main>
+
+            <!-- Toast Notifications -->
+            <div id="toastContainer" class="toast-container"></div>
+
+            <!-- SVG Icons (Lucide/Fluent) -->
+            <svg style="display:none">
+                <symbol id="icon-settings" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 8 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 5 15.4a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 8a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 8 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09c0 .66.39 1.26 1 1.51a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 8c.66 0 1.26.39 1.51 1H21a2 2 0 0 1 0 4h-.09c-.66 0-1.26.39-1.51 1z"/></symbol>
+                <symbol id="icon-grid" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></symbol>
+            </svg>
+        </div>
         <script type="module" src="ui/index.js"></script>
     </body>
+</html>
 </html>
