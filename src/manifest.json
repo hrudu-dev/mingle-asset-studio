@@ -1,0 +1,22 @@
+{
+    "testId": "fd3e1208-bb52-4e7d-bf7d-26b0c29e0e12",
+    "name": "Mingle Asset Studio",
+    "version": "1.0.0",
+    "manifestVersion": 2,
+    "requirements": {
+        "apps": [
+            {
+                "name": "Express",
+                "apiVersion": 1
+            }
+        ]
+    },
+    "entryPoints": [
+        {
+            "type": "panel",
+            "id": "panel1",
+            "main": "index.html",
+            "documentSandbox": "sandbox/code.js"
+        }
+    ]
+}
