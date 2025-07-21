@@ -1,192 +1,220 @@
 # 🧠 Mingle Asset Studio
 
-**AI-Powered Creative Asset Generation and Management for Adobe Express**
+**AI-Powered Creative Asset Generation for Adobe Express**
 
-Mingle Asset Studio is a sophisticated Adobe Express add-on that revolutionizes how creators, designers, marketers, and small teams generate, manage, and organize creative assets using intelligent AI-powered workflows—all within the Express environment.
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Node.js Version](https://img.shields.io/badge/node-%3E%3D14.0.0-brightgreen)](https://nodejs.org/)
+[![Adobe Express Add-on](https://img.shields.io/badge/Adobe%20Express-Add--on-purple)](https://developer.adobe.com/express/)
 
-## ✨ Features
+Mingle Asset Studio is a sophisticated Adobe Express add-on that revolutionizes how creators, designers, marketers, and teams generate custom assets using **multiple AI providers** including HuggingFace, Google Gemini, and Freepik—all seamlessly integrated within Adobe Express.
 
-### 🧬 Smart Asset Generator
-- **Text-to-Asset Creation**: Convert natural language prompts into editable design components
-- **Multiple Asset Types**: Generate images, icons, layouts, and logos
-- **Style Customization**: Choose from modern, minimalist, vintage, bold, elegant, and playful styles
-- **Brand Kit Integration**: Seamlessly incorporate Adobe Express brand colors and guidelines
-- **Context-Aware Suggestions**: AI analyzes your current design context for optimal recommendations
+## 🎯 Key Features
 
-### 📁 Asset Management Panel
-- **Organized Library**: Automatically categorize assets into folders with smart tagging
-- **Advanced Search**: Find assets quickly with text search and type filtering
-- **Drag-and-Drop Integration**: Eflessly add assets to your Adobe Express projects
-- **One-Click Reusability**: Instantly reuse assets across multiple templates and projects
-- **Custom Folders**: Create and organize custom asset collections
+### 🤖 **Multi-Provider AI Generation**
+- **HuggingFace Integration**: Free tier using Pollinations AI + premium models
+- **Google Gemini**: Advanced AI-powered image generation
+- **Freepik API**: Ultra-realistic image generation
+- **Intelligent Fallbacks**: Always works, regardless of API availability
 
-### 📌 Design Context Intelligence
-- **Smart Recommendations**: AI suggests optimal asset formats based on document type
-- **Color Harmony**: Automatic color scheme suggestions based on brand kit analysis
-- **Format Optimization**: Recommends ideal dimensions and formats for different use cases
-- **Usage Analytics**: Track which assets perform best in different contexts
+### 🎨 **Smart Asset Creation**
+- **6 Style Modes**: Cyberpunk, Minimalist, Colorful, Real, Corporate, Artistic
+- **Multiple Asset Types**: Images, Icons, Layouts, Logos
+- **Aspect Ratio Support**: 1:1, 9:16, 16:9 with automatic optimization
+- **Batch Generation**: Creates 4 variations simultaneously
 
-### ⚙️ Quality & Compliance Controls
-- **Automated Quality Assessment**: Built-in rating system for clarity, resolution, and design quality
-- **Brand Compliance Checking**: Ensures assets align with brand guidelines
-- **Resolution Warnings**: Alerts for low-resolution or potentially problematic uploads
-- **Quality Metrics**: Detailed analysis of asset performance and compliance scores
+### 📁 **Integrated Asset Management**
+- **Real-time Output Gallery**: Generated assets immediately available
+- **One-Click Integration**: Direct insertion into Adobe Express documents
+- **Persistent Storage**: Assets saved across sessions
+- **Quality Control**: Built-in error handling and fallback generation
 
-### 🤝 Team Collaboration (Coming Soon)
-- **Asset Comments**: Leave feedback and annotations on individual assets
-- **Shareable Preview Links**: Generate secure links for asset review and approval
-- **Team Workspaces**: Collaborate with team members on shared asset libraries
-- **Version Control**: Track asset iterations and changes over time
-
-### 📊 Asset Usage Insights
-- **Performance Analytics**: Comprehensive metrics on asset usage and effectiveness
-- **Usage Patterns**: Identify most popular asset types and styles
-- **Export Capabilities**: Generate reports for marketing and design review
-- **ROI Tracking**: Measure the impact of different asset types on project success
-
-## 🚀 Getting Started
+## 🚀 Quick Start
 
 ### Prerequisites
-- Adobe Express account
-- Modern web browser with add-on support
-- Node.js (for development)
+- **Adobe Express** account with add-on support
+- **Node.js** 14+ for development
+- **Modern web browser**
 
 ### Installation
 
-1. **Install dependencies**:
+1. **Clone the repository**:
+   ```bash
+   git clone https://github.com/hrudu-dev/mingle-asset-studio.git
+   cd mingle-asset-studio
+   ```
+
+2. **Install dependencies**:
    ```bash
    npm install
    ```
 
-2. **Start development server**:
+3. **Start development server**:
    ```bash
    npm start
    ```
 
-3. **Load in Adobe Express**:
+4. **Load in Adobe Express**:
    - Open Adobe Express
-   - Navigate to Add-ons
-   - Load the development manifest from `src/manifest.json`
+   - Navigate to Add-ons → Developer Mode
+   - Load manifest from `src/manifest.json`
 
-### Quick Start Guide
+### First Asset Generation
 
-1. **Generate Your First Asset**:
-   - Navigate to the 🧬 Generator tab
-   - Enter a descriptive prompt (e.g., "Modern logo for a tech startup with blue colors")
-   - Select your desired asset type and style
-   - Click "✨ Generate Asset"
+1. **Enter a prompt**: "Modern tech logo with blue gradient"
+2. **Select provider**: HuggingFace (default), Gemini, or Freepik
+3. **Choose style**: Minimalist for clean designs
+4. **Generate**: Click "✨ Generate" for 4 AI variations
+5. **Add to document**: Click any generated asset to insert
 
-2. **Manage Your Assets**:
-   - Switch to the 📁 Assets tab
-   - Use search and filters to find specific assets
-   - Create custom folders for organization
-   - Double-click assets to add them to your document
+## 🔧 Configuration
 
-3. **Analyze Performance**:
-   - Check the 📊 Insights tab for usage analytics
-   - Monitor asset performance and popularity
-   - Export data for team review
+### API Setup (Optional)
 
-## 🛠️ Technical Architecture
+The app works out-of-the-box with free services, but you can add API keys for enhanced functionality:
+
+#### HuggingFace API (Recommended)
+```javascript
+// In src/ui/index.js, replace:
+getHuggingFaceApiKey() {
+    return 'YOUR_HUGGINGFACE_API_KEY_HERE'; // Get from https://huggingface.co/settings/tokens
+}
+```
+
+#### Google Gemini API
+```javascript
+// In src/ui/index.js, replace:
+getGeminiApiKey() {
+    return 'YOUR_GEMINI_API_KEY_HERE'; // Get from https://aistudio.google.com/app/apikey
+}
+```
+
+#### Freepik API
+```javascript
+// In src/ui/index.js, replace:
+getFreepikApiKey() {
+    return 'YOUR_FREEPIK_API_KEY_HERE'; // Get from https://freepik.com/api
+}
+```
+
+> **Note**: The app includes free AI generation using Pollinations AI, so API keys are optional for basic functionality.
+
+## 🏗️ Architecture
 
 ### Project Structure
 ```
-src/
-├── index.html          # Main UI interface
-├── manifest.json       # Adobe Express add-on configuration
-├── ui/
-│   ├── index.js        # Main application logic
-│   └── styles.css      # Comprehensive styling
-└── sandbox/
-    ├── code.js         # Document manipulation APIs
-    └── tsconfig.json   # TypeScript configuration
+mingle-asset-studio/
+├── src/
+│   ├── index.html              # Main UI interface
+│   ├── manifest.json           # Adobe Express add-on config
+│   ├── ui/
+│   │   ├── index.js           # Main application controller
+│   │   ├── huggingface-service.js  # HF API integration
+│   │   ├── gemini-service.js      # Gemini API integration
+│   │   ├── freepik-service.js     # Freepik API integration
+│   │   ├── local-models-service.js # Free AI service
+│   │   └── styles.css         # UI styling
+│   └── sandbox/
+│       └── code.js            # Adobe Express integration
+├── docs/                      # Documentation
+├── ABOUT.md                   # Detailed project overview
+└── API_SETUP_GUIDE.md        # API configuration guide
 ```
 
-### Key Technologies
-- **Adobe Express Add-on SDK**: Native integration with Express
-- **Modern JavaScript (ES6+)**: Clean, maintainable codebase
-- **CSS Grid & Flexbox**: Responsive, accessible UI design
-- **Local Storage API**: Persistent asset and preference storage
-
-### API Integration Points
-- **Adobe Express Document SDK**: Direct document manipulation
-- **Adobe Firefly (Future)**: Advanced AI asset generation
-- **Third-party AI APIs**: Extensible integration with Replicate, Stability AI
-- **Brand Kit APIs**: Dynamic color and style extraction
+### Technology Stack
+- **Frontend**: Vanilla JavaScript (ES6+), CSS3, HTML5
+- **Adobe Integration**: Adobe Express Add-on SDK
+- **AI Services**: HuggingFace, Google Gemini, Freepik APIs
+- **Development**: Node.js, NPM, Hot-reloading server
 
 ## 🎨 Usage Examples
 
-### Generating a Logo
+### Generating Marketing Assets
 ```javascript
-// Example configuration for logo generation
-const logoConfig = {
-    prompt: "Minimalist logo for 'EcoGreen' sustainable products company",
-    type: "logo",
-    style: "minimalist",
-    brand: "express-brand-kit"
-};
-```
-
-### Creating Social Media Assets
-```javascript
-// Instagram post optimization
-const socialConfig = {
-    prompt: "Eye-catching product showcase for organic skincare line",
+const marketingAsset = {
+    prompt: "Professional banner for sustainable energy company",
+    style: "corporate",
     type: "image",
-    style: "modern",
-    context: "instagram-post"
+    aspectRatio: "16:9"
 };
 ```
 
-## 🔧 Development
+### Creating Logo Variations
+```javascript
+const logoVariations = {
+    prompt: "Minimalist logo for AI startup, tech-focused",
+    style: "minimalist", 
+    type: "logo",
+    aspectRatio: "1:1"
+};
+```
 
-### Building the Add-on
+### Social Media Content
+```javascript
+const socialContent = {
+    prompt: "Eye-catching product photo for Instagram",
+    style: "colorful",
+    type: "image", 
+    aspectRatio: "1:1"
+};
+```
+
+## �️ Development
+
+### Building for Production
 ```bash
-# Clean previous builds
-npm run clean
-
-# Build for production
+# Build optimized version
 npm run build
 
-# Package for distribution
-npm run package
+# Test the build
+npm run preview
 ```
 
-## 📋 Current Features Status
+### Contributing
+1. Fork the repository
+2. Create a feature branch: `git checkout -b feature-name`
+3. Commit changes: `git commit -am 'Add feature'`
+4. Push to branch: `git push origin feature-name`
+5. Submit a Pull Request
 
-### ✅ Implemented
-- [x] Complete UI with tabbed navigation
-- [x] Asset generator with multiple types and styles
-- [x] Asset management with search and filtering
-- [x] Quality control panel
-- [x] Usage insights and analytics
-- [x] Adobe Express document integration
-- [x] Local storage persistence
+## 📋 Roadmap
+
+### ✅ Current Features
+- [x] Multi-provider AI generation (HuggingFace, Gemini, Freepik)
+- [x] Free tier with Pollinations AI
+- [x] Real-time asset management
+- [x] Adobe Express integration
+- [x] Style-aware generation
+- [x] Batch asset creation
+- [x] Error handling and fallbacks
 
 ### 🚧 In Development
-- [ ] Advanced AI model integration
-- [ ] Real-time collaboration features
-- [ ] Enhanced brand kit integration
-- [ ] Mobile responsiveness optimization
+- [ ] Enhanced prompt optimization
+- [ ] Custom model training
+- [ ] Team collaboration features
+- [ ] Advanced brand kit integration
 
 ### 📅 Planned
-- [ ] Team workspaces
-- [ ] Advanced analytics
-- [ ] Enterprise features
-- [ ] Third-party AI API integration
+- [ ] Mobile app version
+- [ ] Figma plugin
+- [ ] API service for developers
+- [ ] Real-time collaboration
 
-## 📞 Support
+## 📞 Support & Community
 
-- **Issues**: Report bugs and feature requests
-- **Documentation**: Comprehensive guides and API references
-- **Community**: Join discussions with other users
+- **🐛 Issues**: [GitHub Issues](https://github.com/hrudu-dev/mingle-asset-studio/issues)
+- **📖 Documentation**: [Comprehensive Guides](./docs/)
+- **💬 Discussions**: [GitHub Discussions](https://github.com/hrudu-dev/mingle-asset-studio/discussions)
 
 ## 📄 License
 
-This project is licensed under the MIT License.
+This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
+
+## 👨‍💻 Author
+
+**Hrudu Shibu** - [GitHub](https://github.com/hrudu-dev)
 
 ---
 
-**Built with ❤️ for the Adobe Express ecosystem**
+**🎨 Transforming creative workflows with AI-powered asset generation**
 
-*Transforming creative workflows, one asset at a time.*
+*Built with ❤️ for the Adobe Express ecosystem*

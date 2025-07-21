@@ -23,24 +23,24 @@ function start() {
         },
 
         // Enhanced asset creation methods
-        createImageAsset: (config) => {
-            return createVisualAsset(config, 'image');
+        createImageAsset: async (config) => {
+            return await createVisualAsset(config, 'image');
         },
 
-        createIconAsset: (config) => {
-            return createVisualAsset(config, 'icon');
+        createIconAsset: async (config) => {
+            return await createVisualAsset(config, 'icon');
         },
 
-        createLayoutAsset: (config) => {
-            return createLayoutStructure(config);
+        createLayoutAsset: async (config) => {
+            return await createLayoutStructure(config);
         },
 
-        createLogoAsset: (config) => {
-            return createLogoDesign(config);
+        createLogoAsset: async (config) => {
+            return await createLogoDesign(config);
         },
 
-        createGenericAsset: (config) => {
-            return createVisualAsset(config, 'generic');
+        createGenericAsset: async (config) => {
+            return await createVisualAsset(config, 'generic');
         },
 
         // Asset management
@@ -60,11 +60,18 @@ function start() {
     };
 
     // Helper functions for asset creation
-    function createVisualAsset(config, type) {
+    async function createVisualAsset(config, type) {
         try {
-            const { prompt, style = 'modern' } = config;
+            const { prompt, style = 'modern', imageUrl } = config;
             
-            // Create a visual representation based on the asset type
+            console.log(`🎨 Creating ${type} asset with config:`, { prompt, style, hasImage: !!imageUrl });
+            
+            // If we have a generated image URL, use it
+            if (imageUrl) {
+                return await createImageFromUrl(config, type);
+            }
+            
+            // Otherwise create a placeholder
             switch (type) {
                 case 'image':
                     return createImagePlaceholder(config);
@@ -77,6 +84,194 @@ function start() {
             console.error(`Failed to create ${type} asset:`, error);
             throw error;
         }
+    }
+
+    async function createImageFromUrl(config, type) {
+        try {
+            const { imageUrl, prompt, style, aspectRatio = '1:1' } = config;
+            
+            console.log('🖼️ Creating actual image from URL for type:', type);
+            console.log('🔧 Image URL:', imageUrl);
+            console.log('🔧 URL domain:', new URL(imageUrl).hostname);
+            
+            let lastError = null;
+            try {
+                let imageBlob;
+                if (imageUrl.startsWith('data:')) {
+                    // Convert data URL to blob
+                    console.log('🔧 Converting data URL to blob...');
+                    const response = await fetch(imageUrl);
+                    imageBlob = await response.blob();
+                } else {
+                    // External URL - handle CORS issues
+                    console.log('🔧 Fetching external image with CORS handling...');
+                    try {
+                        // Try direct fetch first
+                        const response = await fetch(imageUrl, {
+                            mode: 'cors',
+                            credentials: 'omit'
+                        });
+                        
+                        if (!response.ok) {
+                            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                        }
+                        
+                        imageBlob = await response.blob();
+                        console.log('✅ Direct fetch successful, blob size:', imageBlob.size);
+                    } catch (corsError) {
+                        console.warn('⚠️ CORS fetch failed, trying proxy method:', corsError.message);
+                        
+                        // Fallback: Try to convert to data URL via proxy
+                        try {
+                            const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(imageUrl)}`;
+                            const response = await fetch(proxyUrl);
+                            imageBlob = await response.blob();
+                            console.log('✅ Proxy fetch successful, blob size:', imageBlob.size);
+                        } catch (proxyError) {
+                            console.error('❌ Both direct and proxy fetch failed:', proxyError);
+                            throw new Error(`Failed to fetch image: ${corsError.message}`);
+                        }
+                    }
+                }
+                console.log('🔧 Creating image from blob, size:', imageBlob.size);
+                console.log('🔧 Available editor methods:', Object.getOwnPropertyNames(editor).filter(name => typeof editor[name] === 'function'));
+                // Try all possible image creation methods
+                let imageElement = null;
+                let methodTried = null;
+                const tryMethods = [
+                    { name: 'createImage', fn: editor.createImage },
+                    { name: 'createImageFromBlob', fn: editor.createImageFromBlob },
+                    { name: 'createBitmapImage', fn: editor.createBitmapImage }
+                ];
+                for (const method of tryMethods) {
+                    if (typeof method.fn === 'function') {
+                        try {
+                            console.log(`🔧 Trying ${method.name}...`);
+                            imageElement = await method.fn.call(editor, imageBlob);
+                            methodTried = method.name;
+                            break;
+                        } catch (err) {
+                            lastError = err;
+                            console.warn(`⚠️ ${method.name} failed:`, err);
+                        }
+                    }
+                }
+                if (!imageElement) {
+                    throw new Error('No image creation method succeeded. Last error: ' + (lastError ? lastError.message : 'unknown'));
+                }
+                // Set dimensions based on aspect ratio and type
+                const dimensions = getAssetDimensions(type, aspectRatio);
+                imageElement.width = dimensions.width;
+                imageElement.height = dimensions.height;
+                imageElement.translation = { x: 20, y: 20 };
+                // Add to document
+                const insertionParent = editor.context.insertionParent;
+                insertionParent.children.append(imageElement);
+                // Add a label for context
+                const label = editor.createText();
+                label.text = `Generated: "${prompt.substring(0, 30)}..."`;
+                label.translation = { x: 20, y: dimensions.height + 40 };
+                label.fontSize = 12;
+                const labelColor = { red: 0.2, green: 0.2, blue: 0.2, alpha: 1 };
+                const labelFill = editor.makeColorFill(labelColor);
+                label.fill = labelFill;
+                insertionParent.children.append(label);
+                console.log('✅ Real generated image successfully added to document using', methodTried);
+                return { 
+                    success: true, 
+                    type: type, 
+                    elements: [imageElement, label],
+                    imageUrl: imageUrl,
+                    isRealImage: true,
+                    methodTried,
+                    lastError: null
+                };
+            } catch (imageError) {
+                lastError = imageError;
+                console.warn('⚠️ Failed to create real image, using styled placeholder:', imageError);
+                // Fallback to a more sophisticated placeholder that represents the actual content
+                const dimensions = getAssetDimensions(type, aspectRatio);
+                // Create main rectangle to represent the image
+                const imageRect = editor.createRectangle();
+                imageRect.width = dimensions.width;
+                imageRect.height = dimensions.height;
+                imageRect.translation = { x: 20, y: 20 };
+                // Use style-based colors
+                const styleColors = getStyleColors(style);
+                const imageFill = editor.makeColorFill(styleColors.primary);
+                imageRect.fill = imageFill;
+                // Add generated image indicator
+                const indicator = editor.createRectangle();
+                indicator.width = 120;
+                indicator.height = 30;
+                indicator.translation = { x: 25, y: 25 };
+                indicator.fill = editor.makeColorFill(styleColors.accent);
+                // Add text overlay
+                const label = editor.createText();
+                label.text = `⚠️ AI Image Insert Failed`;
+                label.translation = { x: 30, y: 35 };
+                label.fontSize = 12;
+                const labelColor = { red: 1, green: 1, blue: 1, alpha: 1 };
+                const labelFill = editor.makeColorFill(labelColor);
+                label.fill = labelFill;
+                // Add prompt text
+                const promptLabel = editor.createText();
+                promptLabel.text = `"${prompt.substring(0, 40)}..."`;
+                promptLabel.translation = { x: 25, y: dimensions.height + 30 };
+                promptLabel.fontSize = 11;
+                const promptColor = { red: 0.4, green: 0.4, blue: 0.4, alpha: 1 };
+                const promptFill = editor.makeColorFill(promptColor);
+                promptLabel.fill = promptFill;
+                // Add error message
+                const errorLabel = editor.createText();
+                errorLabel.text = lastError ? `Error: ${lastError.message}` : 'Unknown error';
+                errorLabel.translation = { x: 25, y: dimensions.height + 50 };
+                errorLabel.fontSize = 10;
+                errorLabel.fill = labelFill;
+                // Add all elements to document
+                const insertionParent = editor.context.insertionParent;
+                insertionParent.children.append(imageRect);
+                insertionParent.children.append(indicator);
+                insertionParent.children.append(label);
+                insertionParent.children.append(promptLabel);
+                insertionParent.children.append(errorLabel);
+                console.log('✅ Generated image placeholder with error message added to document');
+                return { 
+                    success: true, 
+                    type: type, 
+                    elements: [imageRect, indicator, label, promptLabel, errorLabel],
+                    imageUrl: imageUrl,
+                    isRealImage: false,
+                    lastError: lastError ? lastError.message : null
+                };
+            }
+        } catch (error) {
+            console.error('❌ Failed to create image from URL:', error);
+            // Final fallback to basic placeholder
+            return createImagePlaceholder(config);
+        }
+    }
+
+    function getAssetDimensions(type, aspectRatio) {
+        const baseDimensions = {
+            'image': { width: 400, height: 300 },
+            'icon': { width: 64, height: 64 },
+            'logo': { width: 200, height: 100 },
+            'layout': { width: 600, height: 400 }
+        };
+        
+        let base = baseDimensions[type] || baseDimensions['image'];
+        
+        // Adjust for aspect ratio
+        if (aspectRatio === '16:9') {
+            base.height = Math.round(base.width * 9 / 16);
+        } else if (aspectRatio === '9:16') {
+            base.width = Math.round(base.height * 9 / 16);
+        } else if (aspectRatio === '1:1') {
+            base.height = base.width;
+        }
+        
+        return base;
     }
 
     function createImagePlaceholder(config) {
@@ -200,8 +395,50 @@ function start() {
         return { success: true, type: 'logo', elements };
     }
 
+    function getStyleColors(style) {
+        const colorSchemes = {
+            'colourful': {
+                primary: { red: 0.96, green: 0.62, blue: 0.04, alpha: 1 }, // Orange
+                secondary: { red: 0.98, green: 0.75, blue: 0.14, alpha: 1 },
+                accent: { red: 0.92, green: 0.40, blue: 0.13, alpha: 1 }
+            },
+            'cyberpunk': {
+                primary: { red: 0.49, green: 0.23, blue: 0.93, alpha: 1 }, // Purple
+                secondary: { red: 0.88, green: 0.91, blue: 1.0, alpha: 1 },
+                accent: { red: 0.77, green: 0.71, blue: 0.99, alpha: 1 }
+            },
+            'real': {
+                primary: { red: 0.22, green: 0.25, blue: 0.32, alpha: 1 }, // Gray
+                secondary: { red: 0.98, green: 0.98, blue: 0.98, alpha: 1 },
+                accent: { red: 0.61, green: 0.64, blue: 0.69, alpha: 1 }
+            },
+            'modern': {
+                primary: { red: 0.31, green: 0.28, blue: 0.90, alpha: 1 }, // Blue
+                secondary: { red: 0.51, green: 0.55, blue: 0.97, alpha: 1 },
+                accent: { red: 1.0, green: 1.0, blue: 1.0, alpha: 1 }
+            },
+            'minimalist': {
+                primary: { red: 0.97, green: 0.98, blue: 0.99, alpha: 1 }, // Light gray
+                secondary: { red: 0.12, green: 0.16, blue: 0.22, alpha: 1 },
+                accent: { red: 0.42, green: 0.45, blue: 0.50, alpha: 1 }
+            }
+        };
+        
+        return colorSchemes[style] || colorSchemes['modern'];
+    }
+
+    function extractBrandNameFromPrompt(prompt) {
+        // Extract potential brand name from prompt
+        const words = prompt.split(' ');
+        // Take first 1-2 meaningful words
+        const brandWords = words.slice(0, 2).filter(word => 
+            word.length > 2 && !['logo', 'for', 'the', 'and', 'a', 'an'].includes(word.toLowerCase())
+        );
+        return brandWords.join(' ') || 'Brand Logo';
+    }
+
     function createGenericPlaceholder(config) {
-        const { prompt } = config;
+        const { prompt, style } = config;
         
         // Create a simple placeholder
         const placeholder = editor.createRectangle();
@@ -209,8 +446,8 @@ function start() {
         placeholder.height = 150;
         placeholder.translation = { x: 30, y: 30 };
         
-        const color = { red: 0.8, green: 0.8, blue: 0.9, alpha: 1 };
-        placeholder.fill = editor.makeColorFill(color);
+        const styleColors = getStyleColors(style);
+        placeholder.fill = editor.makeColorFill(styleColors.primary);
         
         const label = editor.createText();
         label.text = `Generated Asset\n"${prompt.substring(0, 20)}..."`;

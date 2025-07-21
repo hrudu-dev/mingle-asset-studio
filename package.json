@@ -1,7 +1,21 @@
 {
     "name": "mingle-asset-studio",
     "version": "1.0.0",
-    "description": "Adobe Express add-on that helps creators generate, manage, and organize creative assets using smart AI-powered workflows.",
+    "description": "AI-powered creative asset generation for Adobe Express with multi-provider support (HuggingFace, Gemini, Freepik)",
+    "main": "src/index.html",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/hrudu-dev/mingle-asset-studio.git"
+    },
+    "homepage": "https://github.com/hrudu-dev/mingle-asset-studio#readme",
+    "bugs": {
+        "url": "https://github.com/hrudu-dev/mingle-asset-studio/issues"
+    },
+    "author": {
+        "name": "Hrudu Shibu",
+        "url": "https://github.com/hrudu-dev"
+    },
+    "license": "MIT",
     "scripts": {
         "clean": "ccweb-add-on-scripts clean",
         "build": "ccweb-add-on-scripts build",
@@ -9,19 +23,34 @@
         "package": "ccweb-add-on-scripts package"
     },
     "keywords": [
-        "Adobe",
-        "Express",
+        "Adobe Express",
         "Add-on",
         "AI",
-        "Asset Management",
+        "HuggingFace",
+        "Gemini",
+        "Freepik",
+        "Asset Generation",
         "Creative Workflow",
-        "Design Automation"
+        "Design Automation",
+        "Image Generation",
+        "Text-to-Image"
     ],
     "dependencies": {
         "uuid": "^9.0.0"
     },
     "devDependencies": {
         "@adobe/ccweb-add-on-scripts": "^3.0.0",
-        "@types/adobe__ccweb-add-on-sdk": "^1.3.0"
-    }
+        "@types/adobe__ccweb-add-on-sdk": "^1.3.0",
+        "@types/node": "^24.0.15",
+        "typescript": "^5.8.3"
+    },
+    "engines": {
+        "node": ">=14.0.0",
+        "npm": ">=6.0.0"
+    },
+    "browserslist": [
+        "last 2 versions",
+        "not dead",
+        "not ie 11"
+    ]
 }
